@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='bls',
-    version='0.0.1',
+    version='0.0.3',
     author="Oliver Sherouse",
     author_email="oliver.sherouse@gmail.com",
     py_modules=["bls"],
