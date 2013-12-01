@@ -1,0 +1,26 @@
+[
+{
+    "id": "ce",
+    "description": "National Employment, Hours, and Earnings",
+    "parts": ["seasonal", "industry", "datatype"]
+},
+{
+    "id": "ee",
+    "description": "National Employment, Hours, and Earnings (SIC basis)",
+    "parts": ["seasonal", "industry", "datatype"],
+    "seasonal": [["Seasonally Adjusted", "S"]]
+},
+{
+    "id": "sm",
+    "description": "State and Area Employment, Hours, and Earnings",
+    "parts": ["state", "area", "industry", "data_type"]
+},
+
+{
+    "id": "la",
+    "description": "Local Area Unemployment Statistics",
+    "parts": ["seasonal", "area", "measure"],
+    "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
+}
+]
+

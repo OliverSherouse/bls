@@ -1,9 +1,7 @@
 """
-BEA.py
-
-A Library to access the Bureau of Labor Statistics API
+api.py: access the BLS api directly
 """
-#
+
 #Copyright (C) 2012-2013 Oliver Sherouse <Oliver DOT Sherouse AT gmail DOT com>
 
 #This program is free software; you can redistribute it and/or
@@ -45,7 +43,8 @@ def get_series(series, startyear=None, endyear=None):
     :endyear: The last year for which to retrieve data. Defaults to ten years
         after the startyear, if given, or else the current year
     :returns: a pandas DataFrame object with each series as a column and each
-        monthly observation as a row
+        monthly observation as a row. If only one series is requested, a pandas
+        Series object is returned instead of a DataFrame.
     """
     if type(series) == str:
         series = [series]
@@ -65,11 +64,8 @@ def get_series(series, startyear=None, endyear=None):
     resp = urlopen(Request(BASE_URL, data=data, headers=headers)).read()
     resp = json.loads(resp.decode())
     results = json.loads(resp["Results"])
-    try:
-        df = pd.DataFrame({series["seriesID"]: {
-            datetime.datetime(int(i["year"]), int(i["period"][-2:]), 1):
-            float(i["value"]) for i in series["data"] if i["period"] != "M13"}
-            for series in results["series"]})
-    except ValueError:
-        print(i)
-    return(df)
+    df = pd.DataFrame({series["seriesID"]: {
+        datetime.datetime(int(i["year"]), int(i["period"][-2:]), 1):
+        float(i["value"]) for i in series["data"] if i["period"] != "M13"}
+        for series in results["series"]})
+    return df[df.columns[0]] if len(df.columns) == 1 else df
