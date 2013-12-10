@@ -64,7 +64,7 @@ def get_series(series, startyear=None, endyear=None):
     headers = {"Content-type": "application/json"}
     resp = urlopen(Request(BASE_URL, data=data, headers=headers)).read()
     resp = json.loads(resp.decode())
-    results = json.loads(resp["Results"])
+    results = resp["Results"]
     try:
         df = pd.DataFrame({series["seriesID"]: {
             datetime.datetime(int(i["year"]), int(i["period"][-2:]), 1):
