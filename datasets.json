@@ -8,19 +8,61 @@
     "id": "ee",
     "description": "National Employment, Hours, and Earnings (SIC basis)",
     "parts": ["seasonal", "industry", "datatype"],
-    "seasonal": [["Seasonally Adjusted", "S"]]
+    "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
 },
 {
     "id": "sm",
     "description": "State and Area Employment, Hours, and Earnings",
-    "parts": ["state", "area", "industry", "data_type"]
+    "parts": ["state", "seasonal", "area", "industry", "data_type"],
+    "seasonal": [["Not Seasonally Adjusted", "U"]]
 },
-
+{
+    "id": "sa",
+    "description": "State and Area Employment, Hours, and Earnings (SIC basis)",
+    "parts": ["seasonal", "state", "area", "industry", "data_type"],
+    "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
+},
+{
+    "id": "oe",
+    "description": "Occupational Employment Statistics (OES)",
+    "parts": ["seasonal", "areatype", "area", "industry", "occupation", "datatype"]
+},
+{
+    "id": "bd",
+    "description": "Business Employment Dynamics",
+    "parts": ["seasonal", "state", "industry", "unitanalysis", "dataelement",
+              "dataclass", "ratelevel", "recordtype", "ownership"],
+    "recordtype": [["Quarterly", "Q"]]
+},
 {
     "id": "la",
     "description": "Local Area Unemployment Statistics",
     "parts": ["seasonal", "area", "measure"],
     "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
+},
+{
+    "id": "gp",
+    "description": "Geographic Profile",
+    "parts": ["seasonal", "statepad", "state", "areapad", "area", "labor.force",
+              "charact"],
+    "statepad": [["State pad", "0"]],
+    "areapad": [["Area pad", "0"]],
+    "seasonal": [["Not Seasonally Adjusted", "U"]]
+},
+{
+    "id": "jl",
+    "description": "Job Openings and Labor Turnover Survey (SIC basis)",
+    "parts": ["seasonal", "industry", "region", "dataelement", "ratelevel"]
+},
+{
+    "id": "gg",
+    "description": "Job Openings and Labor Turnover Survey (SIC basis)",
+    "parts": ["seasonal", "periodicity", "area", "industry", "future", 
+              "own", "future2", "dataelement", "future3", "ratelevel"],
+    "seasonal": [["Not Seasonally Adjusted", "U"]],
+    "future": [["Future Use", "00"]],
+    "future2": [["Future Use", "0"]],
+    "future3": [["Future Use", "0"]]
 }
 ]
 

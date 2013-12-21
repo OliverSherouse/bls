@@ -32,9 +32,17 @@ import sys
 
 BASEURL = "ftp://ftp.bls.gov/pub/time.series/{0}/{0}.{1}"
 
+MANUAL = {
+    ("ml", "srd"): (1, 0, 0),
+    ("ml", "dataseries"): (1, 0, 0),
+    ("ml", "industrybase"): (1, 0, 0),
+    ("ml", "dataelement"): (1, 0, 0),
+}
+
 
 def get_lines(data_id, part):
     try:
+        print("Getting {}".format(BASEURL.format(data_id, part)))
         url = urllib.request.urlopen(BASEURL.format(data_id, part))
         lines = url.read().decode().splitlines()
     except urllib.error.URLError:
@@ -63,6 +71,9 @@ def find_likely(split, part, endings):
 def get_part_dict(data_id, part):
     lines = get_lines(data_id, part)
     split = [i.split("\t") for i in lines if i != '']
+    if (data_id, part) in MANUAL:
+        label_col, code_col, startat = MANUAL[(data_id, part)]
+        return tuple((i[label_col], i[code_col]) for i in split[startat:])
     if len(split[0]) == 2:
         return tuple((i[1], i[0]) for i in split[1:])
     try:

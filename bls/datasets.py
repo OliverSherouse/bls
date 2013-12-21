@@ -52,14 +52,14 @@ class Dataset(object):
             else:
                 partcode = self._defaults[part]
             id_code.append(partcode)
-        return "".join(id_code)
+        return "".join(id_code).upper()
 
 with open(os.path.join(os.path.dirname(__file__), "datasets.json")) as inf:
     ids = json.load(inf)
 
-DATASETS = [Dataset(i) for i in ids]
+DATASETS = {j.code: j for j in (Dataset(i) for i in ids)}
 
 def search_datasets(query):
     terms = [i.casefold() for i in query.split()]
-    return {i.description: i for i in DATASETS
+    return {i.description: i.code for i in DATASETS.values()
             if all([j in i.description.casefold() for j in terms])}
