@@ -1,8 +1,33 @@
 [
 {
+    "id": "ap",
+    "description": "Average Price Data",
+    "parts": ["seasonal", "area", "item"],
+    "seasonal": [["Not Seasonally Adjusted", "U"]]
+},
+{
+    "id": "bd",
+    "description": "Business Employment Dynamics",
+    "parts": ["seasonal", "state", "industry", "unitanalysis", "dataelement", "dataclass", "ratelevel", "recordtype", "ownership"],
+    "recordtype": [["Quarterly", "Q"]]
+},
+{
+    "id": "cc",
+    "description": "Employer Costs for Employee Compensation",
+    "parts": ["seasonal", "sector", "benefit", "industryocc", "costfactor"],
+    "seasonal": [["Not Seasonally Adjusted", "U"]]
+},
+{
+    "id": "cd",
+    "description": "Occupational Injuries and Illnesses - Characteristics Data",
+    "parts": ["seasonal", "category2", "source", "datatype", "case"],
+    "seasonal": [["Not Seasonally Adjusted", "U"]]
+},
+{
     "id": "ce",
     "description": "National Employment, Hours, and Earnings",
-    "parts": ["seasonal", "industry", "datatype"]
+    "parts": ["seasonal", "industry", "datatype"],
+    "seasonal": [["Not Seasonally Adjusted", "U"]]
 },
 {
     "id": "ee",
@@ -11,34 +36,14 @@
     "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
 },
 {
-    "id": "sm",
-    "description": "State and Area Employment, Hours, and Earnings",
-    "parts": ["state", "seasonal", "area", "industry", "data_type"],
-    "seasonal": [["Not Seasonally Adjusted", "U"]]
-},
-{
-    "id": "sa",
-    "description": "State and Area Employment, Hours, and Earnings (SIC basis)",
-    "parts": ["seasonal", "state", "area", "industry", "data_type"],
-    "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
-},
-{
-    "id": "oe",
-    "description": "Occupational Employment Statistics (OES)",
-    "parts": ["seasonal", "areatype", "area", "industry", "occupation", "datatype"]
-},
-{
-    "id": "bd",
-    "description": "Business Employment Dynamics",
-    "parts": ["seasonal", "state", "industry", "unitanalysis", "dataelement",
-              "dataclass", "ratelevel", "recordtype", "ownership"],
-    "recordtype": [["Quarterly", "Q"]]
-},
-{
-    "id": "la",
-    "description": "Local Area Unemployment Statistics",
-    "parts": ["seasonal", "area", "measure"],
-    "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
+    "id": "gg",
+    "description": "Job Openings and Labor Turnover Survey (SIC basis)",
+    "parts": ["seasonal", "periodicity", "area", "industry", "future", 
+              "own", "future2", "dataelement", "future3", "ratelevel"],
+    "seasonal": [["Not Seasonally Adjusted", "U"]],
+    "future": [["Future Use", "00"]],
+    "future2": [["Future Use", "0"]],
+    "future3": [["Future Use", "0"]]
 },
 {
     "id": "gp",
@@ -55,14 +60,27 @@
     "parts": ["seasonal", "industry", "region", "dataelement", "ratelevel"]
 },
 {
-    "id": "gg",
-    "description": "Job Openings and Labor Turnover Survey (SIC basis)",
-    "parts": ["seasonal", "periodicity", "area", "industry", "future", 
-              "own", "future2", "dataelement", "future3", "ratelevel"],
-    "seasonal": [["Not Seasonally Adjusted", "U"]],
-    "future": [["Future Use", "00"]],
-    "future2": [["Future Use", "0"]],
-    "future3": [["Future Use", "0"]]
+    "id": "la",
+    "description": "Local Area Unemployment Statistics",
+    "parts": ["seasonal", "area", "measure"],
+    "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
+},
+{
+    "id": "oe",
+    "description": "Occupational Employment Statistics (OES)",
+    "parts": ["seasonal", "areatype", "area", "industry", "occupation", "datatype"]
+},
+{
+    "id": "sm",
+    "description": "State and Area Employment, Hours, and Earnings",
+    "parts": ["state", "seasonal", "area", "industry", "data_type"],
+    "seasonal": [["Not Seasonally Adjusted", "U"]]
+},
+{
+    "id": "sa",
+    "description": "State and Area Employment, Hours, and Earnings (SIC basis)",
+    "parts": ["seasonal", "state", "area", "industry", "data_type"],
+    "seasonal": [["Seasonally Adjusted", "S"], ["Not Seasonally Adjusted", "U"]]
 }
 ]
 
