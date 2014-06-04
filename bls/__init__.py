@@ -22,3 +22,4 @@ A Library to access the Bureau of Labor Statistics API
 from .api import get_series
 from .datasets import DATASETS
 from .datasets import search_datasets
+version = 0.0.6
