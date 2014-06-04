@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+import re
+from setuptools import setup
+
+version = re.search(
+    '^__version__\s*=\s*"(.*)"',
+    open('wbdata/__init__.py').read(),
+    re.M
+    ).group(1)
 
 setup(
     name='bls',
-    version='0.0.3',
+    version=version
     author="Oliver Sherouse",
     author_email="oliver.sherouse@gmail.com",
-    py_modules=["bls"],
+    packages=["bls"],
     url="https://github.com/OliverSherouse/bls",
     description="A library to access Bureau of Labor Statistics data",
     requires=["pandas"],
