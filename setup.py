@@ -5,13 +5,13 @@ from setuptools import setup
 
 version = re.search(
     '^__version__\s*=\s*"(.*)"',
-    open('wbdata/__init__.py').read(),
+    open('bls/__init__.py').read(),
     re.M
     ).group(1)
 
 setup(
     name='bls',
-    version=version
+    version=version,
     author="Oliver Sherouse",
     author_email="oliver.sherouse@gmail.com",
     packages=["bls"],
