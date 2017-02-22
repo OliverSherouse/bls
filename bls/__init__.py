@@ -4,7 +4,7 @@ bls.py
 A Library to access the Bureau of Labor Statistics API
 """
 #
-#Copyright (C) 2012-2013 Oliver Sherouse <Oliver DOT Sherouse AT gmail DOT com>
+#Copyright (C) 2012-2017 Oliver Sherouse <Oliver DOT Sherouse AT gmail DOT com>
 
 #This program is free software; you can redistribute it and/or
 #modify it under the terms of the GNU General Public License
@@ -20,6 +20,4 @@ A Library to access the Bureau of Labor Statistics API
 #along with this program; if not. If not, see <http://www.gnu.org/licenses/>.
 
 from .api import get_series
-from .datasets import DATASETS
-from .datasets import search_datasets
 __version__ = "0.0.6"
