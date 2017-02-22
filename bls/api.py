@@ -6,16 +6,13 @@ from __future__ import (print_function, division, absolute_import,
                         unicode_literals)
 
 import datetime
-import json
-try:
-    from urllib.request import Request, urlopen
-except ImportError: #python2
-    from urllib2 import Request, urlopen
 
 
+import requests
 import pandas as pd
 
-BASE_URL = "http://api.bls.gov/publicAPI/v1/timeseries/data/"
+BASE_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
+
 
 def get_series(series, startyear=None, endyear=None):
     """
@@ -41,13 +38,11 @@ def get_series(series, startyear=None, endyear=None):
             endyear = min(int(startyear) + 10, thisyear)
     elif startyear is None:
         startyear = int(endyear) - 10
-    data = json.dumps({"seriesid": series,
-                       "startyear": str(startyear),
-                       "endyear": str(endyear),
-                       }).encode()
-    headers = {"Content-type": "application/json"}
-    resp = urlopen(Request(BASE_URL, data=data, headers=headers)).read()
-    resp = json.loads(resp.decode())
+    data = {
+        "seriesid": series,
+        "startyear": startyear,
+        "endyear": endyear}
+    resp = requests.post(BASE_URL, data=data).json()
     results = resp["Results"]
     df = pd.DataFrame({series["seriesID"]: {
         datetime.datetime(int(i["year"]), int(i["period"][-2:]), 1):
