@@ -16,6 +16,7 @@ BASE_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
 
 class _Key(object):
+
     def __init__(self):
         self.key = os.environ.get('BLS_API_KEY')
 
@@ -38,9 +39,9 @@ def _get_json(series, startyear=None, endyear=None, key=None,
     thisyear = datetime.datetime.today().year
     if endyear is None or int(endyear) > thisyear:
         if startyear is None:
-            endyear, startyear = thisyear, thisyear - 10
+            endyear, startyear = thisyear, thisyear - 9
         else:
-            endyear = min(int(startyear) + 10, thisyear)
+            endyear = min(int(startyear) + 9, thisyear)
     elif startyear is None:
         startyear = int(endyear) - 10
     # TODO: daisy-chain requests to cover full timespan
