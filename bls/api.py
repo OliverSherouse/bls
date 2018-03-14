@@ -62,6 +62,40 @@ def _get_json(series, startyear=None, endyear=None, key=None,
     return requests.post(BASE_URL, data=data).json()["Results"]
 
 
+def parse_series(series):
+    df = pd.DataFrame(series['data'])
+    freq = df['period'].iloc[0][0]
+    if freq == 'A':
+        return (
+            df.assign(date=pd.to_datetime(df['year']))
+            .set_index('date')
+            .to_period(freq='A-JAN')
+            ['value']
+        )
+    if freq == 'Q':
+        return (
+            df.assign(date=pd.to_datetime(
+                df['year']
+                .str.cat(df['period'].str.replace('Q0', 'Q'))
+            ))
+            .set_index('date')
+            .to_period(freq='Q')
+            ['value']
+        )
+    if freq == 'M':
+        return (
+            df.assign(date=pd.to_datetime(
+                df['year']
+                .str.cat(df['period'].str.replace('M', '-'))
+            ))
+            [df['period'] != 'M13']
+            .set_index('date')
+            .to_period(freq='M')
+            ['value']
+        )
+    raise ValueError('Unknown period format: {}'.format(df['period'].iloc[0]))
+
+
 def get_series(series, startyear=None, endyear=None, key=None,
                catalog=False, calculations=False, annualaverages=False):
     """
@@ -80,11 +114,8 @@ def get_series(series, startyear=None, endyear=None, key=None,
     results = _get_json(series, startyear, endyear, key, catalog,
                         calculations, annualaverages)
     df = pd.DataFrame({
-        series["seriesID"]: {
-            "-".join((i['year'], i['period'])): i["value"]
-            for i in series["data"]
-            if i["period"] != "M13"
-        } for series in results["series"]})
-    df.index = pd.to_datetime(df.index)
+        series["seriesID"]: get_series(series)
+        for series in results["series"]
+    })
     df = df.applymap(float)
     return df[df.columns[0]] if len(df.columns) == 1 else df
