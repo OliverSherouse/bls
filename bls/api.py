@@ -6,13 +6,15 @@ from __future__ import (print_function, division, absolute_import,
                         unicode_literals)
 
 import datetime
-
-
 import os
 import requests
+import json
 import pandas as pd
 
 BASE_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
+
+listsum = lambda iterable: sum(iterable, [])
+_headers = {'Content-type': 'application/json'}
 
 
 class _Key(object):
@@ -34,24 +36,24 @@ def unset_api_key():
 
 def _get_json(series, startyear=None, endyear=None, key=None,
               catalog=False, calculations=False, annualaverages=False):
+
+    # Process keywords and set defaults
     if type(series) == str:
         series = [series]
     thisyear = datetime.datetime.today().year
-    if endyear is None or int(endyear) > thisyear:
-        if startyear is None:
-            endyear, startyear = thisyear, thisyear - 9
-        else:
-            endyear = min(int(startyear) + 9, thisyear)
-    elif startyear is None:
-        startyear = int(endyear) - 10
-    # TODO: daisy-chain requests to cover full timespan
-    key = key if key is not None else _KEY.key
+    if not (endyear and int(endyear) <= thisyear):
+        endyear = thisyear
+    if not startyear:
+        startyear = thisyear - 9
+
+    results = []
+    sectionyear = min(startyear + 9, endyear)
     data = {
         "seriesid": series,
-        "startyear": startyear,
-        "endyear": endyear
+        "startyear": str(startyear),
+        "endyear": str(sectionyear)
     }
-    if key is not None:
+    if key:
         data.update({
             'registrationkey': key,
             'catalog': catalog,
@@ -59,7 +61,31 @@ def _get_json(series, startyear=None, endyear=None, key=None,
             'annualaverages': annualaverages
         })
 
-    return requests.post(BASE_URL, data=data).json()["Results"]
+    # Collect the API results 10 years at a time
+    while startyear <= endyear:
+        key = key or _KEY.key
+        data.update({
+            "startyear": str(startyear),
+            "endyear": str(sectionyear)
+        })
+
+        results.append(requests.post(BASE_URL, 
+            data=json.dumps(data),
+            headers=_headers).json()["Results"])
+        startyear, sectionyear = sectionyear + 1, min(sectionyear + 10, endyear)
+
+    num_decades = len(results)
+    num_series = len(results[0]['series'])
+
+    merged = { 
+            'series': [{ 
+                'data': listsum([results[j]['series'][0]['data'] \
+                        for j in range(num_decades)]),
+                'seriesID': results[0]['series'][i]['seriesID'], 
+                } for i in range(num_series)]
+            }
+
+    return merged 
 
 
 def parse_series(series):
@@ -124,3 +150,4 @@ def get_series(series, startyear=None, endyear=None, key=None,
     })
     df = df.applymap(float)
     return df[df.columns[0]] if len(df.columns) == 1 else df
+
