@@ -9,7 +9,7 @@ import os
 import re
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup
 # To use a consistent encoding
 from codecs import open
 
@@ -33,7 +33,6 @@ def find_version(*file_paths):
 
 long_description = read('README.rst')
 version = find_version('bls', '__init__.py')
-install_requires = read('requirements.txt').splitlines()
 
 setup(
     name='bls',
@@ -43,11 +42,15 @@ setup(
     packages=['bls'],
     url='https://github.com/OliverSherouse/bls',
     description='A library to access Bureau of Labor Statistics data',
-    install_requires=install_requires,
+    install_requires=[
+        'pandas',
+        'requests',
+    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
+        ('License :: OSI Approved :: '
+         'GNU General Public License v2 or later (GPLv2+)'),
         'Operating System :: OS Independent',
         'Topic :: Scientific/Engineering',
         'Programming Language :: Python',
