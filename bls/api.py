@@ -63,6 +63,11 @@ def _get_json(series, startyear=None, endyear=None, key=None,
 
 
 def parse_series(series):
+    if not len(series['data']):
+        raise ValueError(
+            'No data received for series {}! Are your parameters correct?'
+            .format(series['SeriesID'])
+        )
     df = pd.DataFrame(series['data'])
     freq = df['period'].iloc[0][0]
     if freq == 'A':
@@ -114,7 +119,7 @@ def get_series(series, startyear=None, endyear=None, key=None,
     results = _get_json(series, startyear, endyear, key, catalog,
                         calculations, annualaverages)
     df = pd.DataFrame({
-        series["seriesID"]: get_series(series)
+        series["seriesID"]: parse_series(series)
         for series in results["series"]
     })
     df = df.applymap(float)
