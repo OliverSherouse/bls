@@ -4,6 +4,14 @@ import bls
 import pytest
 
 
+@pytest.fixture
+def nokey():
+    key = bls.api._KEY.key
+    bls.api.unset_api_key()
+    yield
+    bls.api.set_api_key(key)
+
+
 def test_monthly_value():
     assert bls.get_series(
         'LNS14000000', startyear=1948, endyear=1948
@@ -28,27 +36,28 @@ def test_key_till_thisyear():
     assert (years.min(), years.max()) == (1948, datetime.date.today().year)
 
 
-def test_no_key_start_tenyears():
-    series = bls.get_series('LNS14000000', startyear=1948, key='')
-    years = series.index.year
-    assert (years.min(), years.max()) == (1948, 1957)
-
-
 def test_key_end_twenty_years():
     series = bls.get_series('LNS14000000', endyear=2018)
     years = series.index.year
     assert (years.min(), years.max()) == (1999, 2018)
 
 
-def test_no_key_end_ten_years():
-    series = bls.get_series('LNS14000000', endyear=2018, key='')
-    years = series.index.year
-    assert (years.min(), years.max()) == (2009, 2018)
+# These tests are unreliable because of API limits
+# def test_no_key_start_tenyears(nokey):
+#     series = bls.get_series('LNS14000000', startyear=1948)
+#     years = series.index.year
+#     assert (years.min(), years.max()) == (1948, 1957)
 
 
-def test_error_no_key_too_many_years():
+# def test_no_key_end_ten_years(nokey):
+#     series = bls.get_series('LNS14000000', endyear=2018)
+#     years = series.index.year
+#     assert (years.min(), years.max()) == (2009, 2018)
+
+
+def test_error_no_key_too_many_years(nokey):
     with pytest.raises(ValueError):
-        bls.get_series('LNS14000000', startyear=1948, endyear=2018, key='')
+        bls.get_series('LNS14000000', startyear=1948, endyear=2018)
 
 
 def test_error_no_data():
