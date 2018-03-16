@@ -1,14 +1,23 @@
 bls
 ===
-
 A Python library for the Bureau of Labor Statistics API.
+
+======  ======
+Branch  Status
+======  ======
+Master  .. image:: https://travis-ci.org/OliverSherouse/bls.svg?branch=dev
+           :target: https://travis-ci.org/OliverSherouse/bls
+Dev     .. image:: https://travis-ci.org/OliverSherouse/bls.svg?branch=dev
+           :target: https://travis-ci.org/OliverSherouse/bls
+======  ======
+
 
 Use the function `get_series()` to retrieve data. `get_series()` has four
 arguments: a series id or sequence of series ids, a start year, an end
 year, and an optional API key.
 
 It is highly recommended that you `register for an API key with
-BLS<https://data.bls.gov/registrationEngine/>`_. You can supply the key to the
+BLS <https://data.bls.gov/registrationEngine/>`_. You can supply the key to the
 library by passing it to `get_series()` or by setting an environment variable
 called `BLS_API_KEY`.
 
@@ -31,4 +40,4 @@ yes          yes        yes    `startyear` through `endyear`
 
 
 `bls` is undergoing very rapid development. Look for new features in the near
-future, and report bugs at <https://github.com/OliverSherouse/bls/issues>.
+future, and report bugs at https://github.com/OliverSherouse/bls/issues.
