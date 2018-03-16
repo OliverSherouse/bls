@@ -5,7 +5,9 @@ api.py: access the BLS api directly
 from __future__ import (print_function, division, absolute_import,
                         unicode_literals)
 
+import collections
 import datetime
+import logging
 
 
 import os
@@ -13,6 +15,8 @@ import requests
 import pandas as pd
 
 BASE_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
+
+log = logging.getLogger(__name__)
 
 
 class _Key(object):
@@ -32,41 +36,61 @@ def unset_api_key():
     _KEY.key = None
 
 
-def _get_json(series, startyear=None, endyear=None, key=None,
-              catalog=False, calculations=False, annualaverages=False):
-    if type(series) == str:
-        series = [series]
-    thisyear = datetime.datetime.today().year
-    if endyear is None or int(endyear) > thisyear:
-        if startyear is None:
-            endyear, startyear = thisyear, thisyear - 9
-        else:
-            endyear = min(int(startyear) + 9, thisyear)
-    elif startyear is None:
-        startyear = int(endyear) - 10
-    # TODO: daisy-chain requests to cover full timespan
-    key = key if key is not None else _KEY.key
+def _get_json_subset(series, startyear, endyear, key):
     data = {
         "seriesid": series,
         "startyear": startyear,
         "endyear": endyear
     }
     if key is not None:
-        data.update({
-            'registrationkey': key,
-            'catalog': catalog,
-            'calculations': calculations,
-            'annualaverages': annualaverages
-        })
+        data['registrationkey'] = key
+    response = requests.post(BASE_URL, data=data).json()
+    for message in response['message']:
+        log.warning(message)
+    if response['status'] != 'REQUEST_SUCCEEDED':
+        raise RuntimeError('Got status {}'.format(response['status']))
+    return response["Results"]['series']
 
-    return requests.post(BASE_URL, data=data).json()["Results"]
+
+def get_json_series(series, startyear=None, endyear=None, key=None):
+    if isinstance(series, str):
+        series = [series]
+    startyear = startyear if startyear is None else int(startyear)
+    endyear = endyear if endyear is None else int(endyear)
+    key = key if key is not None else _KEY.key
+    thisyear = datetime.date.today().year
+
+    if endyear is None or (endyear > thisyear):
+        if startyear is None or key is not None:
+            endyear = thisyear
+        else:  # Start year and no key
+            endyear = min(startyear + 9, thisyear)
+
+    if not startyear:
+        startyear = endyear - (9 if key is None else 19)
+
+    if key is None and endyear - startyear >= 10:
+        raise ValueError('Must use API key to retrieve more than 10 years')
+
+    if startyear and endyear - startyear >= 20:
+        compiled_results = collections.defaultdict(list)
+        sub_start, sub_end = startyear, startyear + 19
+        while True:
+            for result in _get_json_subset(series, sub_start, sub_end, key):
+                compiled_results[result['seriesID']].extend(result['data'])
+            sub_start, sub_end = sub_end + 1, min(sub_end + 20, endyear)
+            if sub_start > endyear:
+                break
+        return [{'seriesID': i, 'data': j}
+                for i, j in compiled_results.items()]
+    return _get_json_subset(series, startyear, endyear, key)
 
 
 def parse_series(series):
     if not len(series['data']):
         raise ValueError(
             'No data received for series {}! Are your parameters correct?'
-            .format(series['SeriesID'])
+            .format(series['seriesID'])
         )
     df = pd.DataFrame(series['data'])
     freq = df['period'].iloc[0][0]
@@ -101,8 +125,7 @@ def parse_series(series):
     raise ValueError('Unknown period format: {}'.format(df['period'].iloc[0]))
 
 
-def get_series(series, startyear=None, endyear=None, key=None,
-               catalog=False, calculations=False, annualaverages=False):
+def get_series(series, startyear=None, endyear=None, key=None):
     """
     Retrieve one or more series from BLS. Note that only ten years may be
     retrieved at a time
@@ -116,11 +139,10 @@ def get_series(series, startyear=None, endyear=None, key=None,
         monthly observation as a row. If only one series is requested, a pandas
         Series object is returned instead of a DataFrame.
     """
-    results = _get_json(series, startyear, endyear, key, catalog,
-                        calculations, annualaverages)
+    results = get_json_series(series, startyear, endyear, key)
     df = pd.DataFrame({
-        series["seriesID"]: parse_series(series)
-        for series in results["series"]
+        result["seriesID"]: parse_series(result)
+        for result in results
     })
     df = df.applymap(float)
-    return df[df.columns[0]] if len(df.columns) == 1 else df
+    return df[series].sort_index()
