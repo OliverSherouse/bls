@@ -44,7 +44,7 @@ def _get_json_subset(series, startyear, endyear, key):
     }
     if key is not None:
         data['registrationkey'] = key
-    response = requests.post(BASE_URL, data=data).json()
+    response = requests.post(BASE_URL, json=data).json()
     for message in response['message']:
         log.warning(message)
     if response['status'] != 'REQUEST_SUCCEEDED':
