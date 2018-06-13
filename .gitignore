@@ -1,6 +1,7 @@
 MANIFEST
 *.py[cod]
 .pytest_cache/
+Pipfile.lock
 
 # C extensions
 *.so
