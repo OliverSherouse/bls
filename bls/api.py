@@ -38,7 +38,7 @@ def unset_api_key():
 
 def _get_json_subset(series, startyear, endyear, key):
     data = {
-        "seriesid": series,
+        "seriesid": ','.join(series),
         "startyear": startyear,
         "endyear": endyear
     }
