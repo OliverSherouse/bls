@@ -1,6 +1,7 @@
 import datetime
 
 import bls
+import pandas as pd
 import pytest
 
 
@@ -16,6 +17,21 @@ def test_monthly_value():
     assert bls.get_series(
         'LNS14000000', startyear=1948, endyear=1948
     )['1948-01'] == 3.4
+
+
+def test_monthly_value_multiple():
+    assert (
+        bls.get_series(
+            ['LNS14000000', 'LNS14000001'], startyear=1948, endyear=1948
+        )
+        .xs('1948-01')
+        .equals(
+            pd.Series({
+                'LNS14000000': 3.4,
+                'LNS14000001': 3.4
+            })
+        )
+    )
 
 
 def test_quarterly_value():
