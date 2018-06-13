@@ -6,7 +6,9 @@ python:
 env:
   - PIPENV_IGNORE_VIRTUALENVS=1 
 before_install: pip install pipenv
-install: pipenv install --dev
+install:
+  - pipenv install -e .
+  - pipenv install --dev
 script: pipenv run pytest
 deploy:
   provider: pypi
