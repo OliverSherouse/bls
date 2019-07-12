@@ -8,6 +8,7 @@ from __future__ import (print_function, division, absolute_import,
 import collections
 import datetime
 import logging
+import warnings
 
 
 import os
@@ -87,11 +88,6 @@ def get_json_series(series, startyear=None, endyear=None, key=None):
 
 
 def parse_series(series):
-    if not len(series['data']):
-        raise ValueError(
-            'No data received for series {}! Are your parameters correct?'
-            .format(series['seriesID'])
-        )
     df = pd.DataFrame(series['data'])
     freq = df['period'].iloc[0][0]
     if freq == 'A':
@@ -125,7 +121,7 @@ def parse_series(series):
     raise ValueError('Unknown period format: {}'.format(df['period'].iloc[0]))
 
 
-def get_series(series, startyear=None, endyear=None, key=None):
+def get_series(series, startyear=None, endyear=None, key=None, errors='raise'):
     """
     Retrieve one or more series from BLS. Note that only ten years may be
     retrieved at a time
@@ -135,14 +131,28 @@ def get_series(series, startyear=None, endyear=None, key=None):
         years before the endyear
     :endyear: The last year for which to retrieve data. Defaults to ten years
         after the startyear, if given, or else the current year
+    :errors: {'ignore', 'raise'}, default 'raise'
+        If 'ignore', suppress error and only existing series are returned.
     :returns: a pandas DataFrame object with each series as a column and each
         monthly observation as a row. If only one series is requested, a pandas
         Series object is returned instead of a DataFrame.
     """
     results = get_json_series(series, startyear, endyear, key)
+    # Parse out invalid seriesID(s)
+    invalid_ids = [res['seriesID'] for res in results if not res['data']]
+    if errors == 'raise' and invalid_ids:
+        raise ValueError(
+            'No data received for series {}! Are your parameters correct?'
+            .format(invalid_ids)
+        )
+    if invalid_ids:
+        warnings.warn(
+            'No data received for series {}! Are your parameters correct?'
+            .format(invalid_ids)
+        )
     df = pd.DataFrame({
         result["seriesID"]: parse_series(result)
-        for result in results
+        for result in results if result['seriesID'] not in invalid_ids
     })
     df = df.applymap(float)
-    return df[series].sort_index()
+    return df[df.columns].sort_index()

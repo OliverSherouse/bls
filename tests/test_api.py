@@ -16,7 +16,7 @@ def nokey():
 def test_monthly_value():
     assert bls.get_series(
         'LNS14000000', startyear=1948, endyear=1948
-    )['1948-01'] == 3.4
+    )['1948-01'].iloc[0][0] == 3.4
 
 
 def test_monthly_value_multiple():
@@ -37,13 +37,13 @@ def test_monthly_value_multiple():
 def test_quarterly_value():
     assert bls.get_series(
         'CIU2020000000000A', startyear=2001, endyear=2001
-    )['2001-Q1'] == 3.8
+    )['2001-Q1'].iloc[0][0] == 3.8
 
 
 def test_annual_value():
     assert bls.get_series(
         'TUU10100AA01000007', startyear=2009, endyear=2009
-    )['2009'] == 148720
+    )['2009'].iloc[0][0] == 148720
 
 
 def test_key_till_thisyear():
@@ -78,4 +78,11 @@ def test_error_no_key_too_many_years(nokey):
 
 def test_error_no_data():
     with pytest.raises(ValueError):
-        bls.get_series('LNS14000000', startyear=1900, endyear=1900)
+        bls.get_series('LNS1400000', startyear=1900, endyear=1900)
+
+
+def test_warning_and_not_valuerror_when_errors_set_to_ignore():
+    with pytest.warns(UserWarning):
+        bls.get_series(
+            ['LNS14000000', 'INVALID_SERIESID'], endyear=2018, errors='ignore'
+        )
