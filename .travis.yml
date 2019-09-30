@@ -6,5 +6,5 @@ python:
 install:
   - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
   - source $HOME/.poetry/env
-  - poetry install -E pandas
+  - poetry install
 script: poetry run pytest
