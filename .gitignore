@@ -1,3 +1,5 @@
+.env
+poetry.lock
 MANIFEST
 *.py[cod]
 .pytest_cache/

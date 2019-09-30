@@ -1,21 +1,10 @@
 language: python
 python:
-- '2.7'
-- '3.5'
-- '3.6'
-env:
-  - PIPENV_IGNORE_VIRTUALENVS=1 
-before_install: pip install pipenv
+  - "3.5"
+  - "3.6"
+  - "3.7"
 install:
-  - pipenv install -e .
-  - pipenv install --dev
-script: pipenv run pytest
-deploy:
-  provider: pypi
-  user: OliverSherouse
-  password:
-    secure: XMnIvqKpjB2+4p1KJ0ZlhBespdvThDK3vUGcGRRDZMtUt6lHn5OL6iSBJk76LyD3XXTYha7yFN8IdA/jx91zUnHG1IYCmiok3SAZc7sYjc2l7DW9WK4MLf1kEwRwA8KfXvDhzZLiusVG52oh7gjiOz2gHS5Mt/ee+YqGLjkgnqqfIt+4fj6ysipI5iGmT78N0e3wHxLWHqfe7rzhB4OcRD7JCILWOSOgHaoyspH/bQGgrgr4ntDa25K8rICBJmi7Tv5ZVbVfJtYM0du+MDxWxZ/mtLH7gq/sEXPc0wJd9+6zqUTdXZBq8wRytOG10UQod1sfXET8rZmemTHIroDfG5Ik8IcQRDk315F7l+55xdy+moax6q5FUCSkCdrf+R03L71eL41imQkFNZYfuV+WS9UTZxvJ/WFJnQwlVbnukcZAhSkePhRZPRJ8s/6CCV7/y+CYnmy1E1LevkrF8E7ZiNjbZf2t3rgjHJyQd8bCG9CsDxqSmXeybI5pZhzX5NeB4drRULKoXuj/BE+P9uiR3Jq5OIEj40OsYJy59Mf06J8zipVdoq9GUcsdoy3mHyY5hPBvSzL7awsd+YG8s9qk4Osg2pjBR6oFzKZtJW3PMw0d/s6LOamrlVh5Ur/JDcqmfPsMtrAPSEQFR6gx4M2T3JAdg4ug7tmzUJWB2QZFZkY=
-  on:
-    tags: true
-    distributions: sdist bdist_wheel
-    repo: OliverSherouse/bls
+  - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+  - source $HOME/.poetry/env
+  - poetry install -E pandas
+script: poetry run pytest
