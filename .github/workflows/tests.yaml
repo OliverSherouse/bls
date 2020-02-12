@@ -24,4 +24,6 @@ jobs:
       - name: Install Dependencies
         run: poetry install
       - name: Run Tests
+        env:
+          BLS_API_KEY: ${{ secrets.bls_api_key }}
         run: poetry run pytest
