@@ -42,7 +42,7 @@ def _get_json_subset(series, startyear, endyear, key):
     for message in response["message"]:
         log.warning(message)
     if response["status"] != "REQUEST_SUCCEEDED":
-        raise RuntimeError("Got status {}".format(response["status"]))
+        raise RuntimeError(f"Got status {response['status']}")
     return response["Results"]["series"]
 
 
@@ -82,9 +82,8 @@ def get_json_series(series, startyear=None, endyear=None, key=None):
 def parse_series(series):
     if not len(series["data"]):
         raise ValueError(
-            "No data received for series {}! Are your parameters correct?".format(
-                series["seriesID"]
-            )
+            f"No data received for series {series['seriesID']}! Are your "
+            "parameters correct?"
         )
     df = pd.DataFrame(series["data"])
     freq = df["period"].iloc[0][0]
@@ -114,7 +113,7 @@ def parse_series(series):
             .set_index("date")
             .to_period(freq="M")["value"]
         )
-    raise ValueError("Unknown period format: {}".format(df["period"].iloc[0]))
+    raise ValueError(f"Unknown period format: {df['period'].iloc[0]}")
 
 
 def get_series(series, startyear=None, endyear=None, key=None):
