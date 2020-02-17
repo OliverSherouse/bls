@@ -11,34 +11,42 @@ import logging
 
 import os
 import requests
-import pandas as pd
+import pandas as pd  # type: ignore
+
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 BASE_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
 log = logging.getLogger(__name__)
 
 
-class _Key(object):
+class Key(object):
     def __init__(self):
         self.key = os.environ.get("BLS_API_KEY")
 
 
-_KEY = _Key()
+_KEY: Key = Key()
 
 
-def set_api_key(key):
+def set_api_key(key: str) -> None:
     _KEY.key = key
 
 
-def unset_api_key():
+def unset_api_key() -> None:
     _KEY.key = None
 
 
-def _get_json_subset(series, startyear, endyear, key):
-    data = {"seriesid": ",".join(series), "startyear": startyear, "endyear": endyear}
+def _get_json_subset(
+    series: Iterator, startyear: int, endyear: int, key: Optional[str] = None
+) -> List[Dict]:
+    data = {
+        "seriesid": ",".join(series),
+        "startyear": startyear,
+        "endyear": endyear,
+    }
     if key is not None:
         data["registrationkey"] = key
-    response = requests.post(BASE_URL, data=data).json()
+    response: Dict[str, Any] = requests.post(BASE_URL, data=data).json()
     for message in response["message"]:
         log.warning(message)
     if response["status"] != "REQUEST_SUCCEEDED":
@@ -46,7 +54,12 @@ def _get_json_subset(series, startyear, endyear, key):
     return response["Results"]["series"]
 
 
-def get_json_series(series, startyear=None, endyear=None, key=None):
+def get_json_series(
+    series: Iterator,
+    startyear: Optional[Union[str, int, float]] = None,
+    endyear: Optional[Union[str, int, float]] = None,
+    key: Optional[str] = None,
+) -> List[dict]:
     if isinstance(series, str):
         series = [series]
     startyear = startyear if startyear is None else int(startyear)
@@ -67,8 +80,8 @@ def get_json_series(series, startyear=None, endyear=None, key=None):
         raise ValueError("Must use API key to retrieve more than 10 years")
 
     if startyear and endyear - startyear >= 20:
-        compiled_results = collections.defaultdict(list)
-        sub_start, sub_end = startyear, startyear + 19
+        compiled_results: collections.defaultdict = collections.defaultdict(list)
+        sub_start, sub_end = startyear, startyear + 18
         while True:
             for result in _get_json_subset(series, sub_start, sub_end, key):
                 compiled_results[result["seriesID"]].extend(result["data"])
@@ -79,7 +92,7 @@ def get_json_series(series, startyear=None, endyear=None, key=None):
     return _get_json_subset(series, startyear, endyear, key)
 
 
-def parse_series(series):
+def parse_series(series: dict) -> pd.DataFrame:
     if not len(series["data"]):
         raise ValueError(
             f"No data received for series {series['seriesID']}! Are your "
@@ -116,7 +129,12 @@ def parse_series(series):
     raise ValueError(f"Unknown period format: {df['period'].iloc[0]}")
 
 
-def get_series(series, startyear=None, endyear=None, key=None):
+def get_series(
+    series: Iterator,
+    startyear: Optional[Union[str, int, float]] = None,
+    endyear: Optional[Union[str, int, float]] = None,
+    key: Optional[str] = None,
+) -> pd.DataFrame:
     """
     Retrieve one or more series from BLS. Note that only ten years may be
     retrieved at a time
