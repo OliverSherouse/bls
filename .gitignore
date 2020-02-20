@@ -1,4 +1,5 @@
 .env
+.mypy_cache/
 poetry.lock
 MANIFEST
 *.py[cod]

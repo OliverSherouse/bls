@@ -1,8 +1,8 @@
 import datetime
 
 import bls
-import pandas as pd
-import pytest
+import pandas as pd  # type: ignore
+import pytest  # type: ignore
 
 
 @pytest.fixture
