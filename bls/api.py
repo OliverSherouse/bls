@@ -7,6 +7,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 import collections
 import datetime
 import logging
+import warnings
 
 
 import os
@@ -134,6 +135,7 @@ def get_series(
     startyear: Optional[Union[str, int, float]] = None,
     endyear: Optional[Union[str, int, float]] = None,
     key: Optional[str] = None,
+    errors: str = "raise"
 ) -> pd.DataFrame:
     """
     Retrieve one or more series from BLS. Note that only ten years may be
@@ -144,11 +146,28 @@ def get_series(
         years before the endyear
     :endyear: The last year for which to retrieve data. Defaults to ten years
         after the startyear, if given, or else the current year
+    :errors: {"ignore", "raise"}, default "raise"
+        If "ignore", suppress error and only existing series are returned.
     :returns: a pandas DataFrame object with each series as a column and each
         monthly observation as a row. If only one series is requested, a pandas
         Series object is returned instead of a DataFrame.
     """
     results = get_json_series(series, startyear, endyear, key)
-    df = pd.DataFrame({result["seriesID"]: parse_series(result) for result in results})
+    # Parse out invalid seriesID(s)
+    invalid_ids = [res["seriesID"] for res in results if not res["data"]]
+    if errors == "raise" and invalid_ids:
+        raise ValueError(
+            "No data received for series {}! Are your parameters correct?"
+            .format(invalid_ids)
+        )
+    if invalid_ids:
+        warnings.warn(
+            "No data received for series {}! Are your parameters correct?"
+            .format(invalid_ids)
+        )
+    df = pd.DataFrame({
+        result["seriesID"]: parse_series(result)
+        for result in results if result["seriesID"] not in invalid_ids
+    })
     df = df.applymap(float)
-    return df[series].sort_index()
+    return df[df.columns].sort_index()
