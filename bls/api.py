@@ -14,7 +14,7 @@ import os
 import requests
 import pandas as pd  # type: ignore
 
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 BASE_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
@@ -38,7 +38,10 @@ def unset_api_key() -> None:
 
 
 def _get_json_subset(
-    series: Iterator, startyear: int, endyear: int, key: Optional[str] = None
+    series: Union[str, Sequence[str]],
+    startyear: int,
+    endyear: int,
+    key: Optional[str] = None,
 ) -> List[Dict]:
     data = {
         "seriesid": ",".join(series),
@@ -56,7 +59,7 @@ def _get_json_subset(
 
 
 def get_json_series(
-    series: Iterator,
+    series: Union[str, Sequence[str]],
     startyear: Optional[Union[str, int, float]] = None,
     endyear: Optional[Union[str, int, float]] = None,
     key: Optional[str] = None,
@@ -131,12 +134,12 @@ def parse_series(series: dict) -> pd.DataFrame:
 
 
 def get_series(
-    series: Iterator,
+    series: Union[str, Sequence[str]],
     startyear: Optional[Union[str, int, float]] = None,
     endyear: Optional[Union[str, int, float]] = None,
     key: Optional[str] = None,
-    errors: str = "raise"
-) -> pd.DataFrame:
+    errors: str = "raise",
+) -> Union[pd.DataFrame, pd.Series]:
     """
     Retrieve one or more series from BLS. Note that only ten years may be
     retrieved at a time
@@ -147,27 +150,37 @@ def get_series(
     :endyear: The last year for which to retrieve data. Defaults to ten years
         after the startyear, if given, or else the current year
     :errors: {"ignore", "raise"}, default "raise"
-        If "ignore", suppress error and only existing series are returned.
+        If "ignore", suppress error and only existing series are returned. If
+        only one series is specified or all series fail, an error is raised
+        regardless of this argument
     :returns: a pandas DataFrame object with each series as a column and each
         monthly observation as a row. If only one series is requested, a pandas
         Series object is returned instead of a DataFrame.
     """
     results = get_json_series(series, startyear, endyear, key)
-    # Parse out invalid seriesID(s)
     invalid_ids = [res["seriesID"] for res in results if not res["data"]]
-    if errors == "raise" and invalid_ids:
-        raise ValueError(
-            "No data received for series {}! Are your parameters correct?"
-            .format(invalid_ids)
-        )
     if invalid_ids:
-        warnings.warn(
-            "No data received for series {}! Are your parameters correct?"
-            .format(invalid_ids)
+        errmsg = (
+            f"No data received for series {invalid_ids}! Are your parameters correct?"
         )
-    df = pd.DataFrame({
-        result["seriesID"]: parse_series(result)
-        for result in results if result["seriesID"] not in invalid_ids
-    })
-    df = df.applymap(float)
-    return df[df.columns].sort_index()
+        if (
+            isinstance(series, str)
+            or len(invalid_ids) == len(series)
+            or errors == "raise"
+        ):
+            raise ValueError(errmsg)
+        warnings.warn(errmsg)
+    df = (
+        pd.DataFrame(
+            {
+                result["seriesID"]: parse_series(result)
+                for result in results
+                if result["data"]
+            }
+        )
+        .applymap(float)
+        .sort_index()
+    )
+    if isinstance(series, str):
+        return df[df.columns[0]]
+    return df
