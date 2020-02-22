@@ -72,3 +72,10 @@ def test_error_no_key_too_many_years(nokey):
 def test_error_no_data():
     with pytest.raises(ValueError):
         bls.get_series("LNS14000000", startyear=1900, endyear=1900)
+
+
+def test_warning_and_not_valuerror_when_errors_set_to_ignore():
+    with pytest.warns(UserWarning):
+        bls.get_series(
+            ["LNS14000000", "INVALID_SERIESID"], endyear=2018, errors="ignore"
+        )
