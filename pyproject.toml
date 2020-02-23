@@ -3,14 +3,17 @@ name = "bls"
 version = "0.4.0.dev"
 description = "A library to access Bureau of Labor Statistics data"
 authors = ["Oliver Sherouse <oliver@oliversherouse.com>"]
-license = "GPL-2.0+"
+license = "GPL-2.0-or-later"
 readme = "README.md"
+repository = "https://github.com/OliverSherouse/bls"
+keywords = ["BLS", "labor", "statistics", "economics", "data"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
 ]
+include=["*.txt", "*.md"]
 
 [tool.poetry.dependencies]
 python = "~=3.6"
