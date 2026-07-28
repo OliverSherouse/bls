@@ -26,3 +26,5 @@ jobs:
         env:
           BLS_API_KEY: ${{ secrets.bls_api_key }}
         run: poetry run pytest
+      - name: Run Type Checks
+        run: poetry run ty check
