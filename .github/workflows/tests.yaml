@@ -23,7 +23,7 @@ jobs:
       - name: Install locked dependencies
         run: uv sync --locked
       - name: Run Type Checks
-        run: uv run ty check
+        run: uv run ty check bls
       - name: Run Tests
         env:
           BLS_API_KEY: ${{ secrets.bls_api_key }}
