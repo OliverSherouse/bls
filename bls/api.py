@@ -12,7 +12,7 @@ import warnings
 
 import os
 import requests
-import pandas as pd  # type: ignore
+import pandas as pd
 
 from typing import Any, Dict, List, Optional, Sequence, Union
 
