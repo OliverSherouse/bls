@@ -1,6 +1,6 @@
 .env
+.venv/
 .mypy_cache/
-poetry.lock
 MANIFEST
 *.py[cod]
 .pytest_cache/
