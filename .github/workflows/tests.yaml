@@ -22,9 +22,9 @@ jobs:
           enable-cache: true
       - name: Install locked dependencies
         run: uv sync --locked
+      - name: Run Type Checks
+        run: uv run ty check
       - name: Run Tests
         env:
           BLS_API_KEY: ${{ secrets.bls_api_key }}
         run: uv run pytest
-      - name: Run Type Checks
-        run: uv run ty check
