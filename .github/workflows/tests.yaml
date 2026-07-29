@@ -14,17 +14,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Install uv and set Python
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
+          version: "0.11.29"
           python-version: ${{ matrix.python-version }}
-      - name: Install Poetry
-        run: pipx install poetry
-      - name: Install Dependencies
-        run: poetry install --no-root
+          enable-cache: true
+      - name: Install locked dependencies
+        run: uv sync --locked
       - name: Run Tests
         env:
           BLS_API_KEY: ${{ secrets.bls_api_key }}
-        run: poetry run pytest
+        run: uv run pytest
       - name: Run Type Checks
-        run: poetry run ty check
+        run: uv run ty check
